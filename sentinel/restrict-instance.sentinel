@@ -1,0 +1,26 @@
+import "tfplan/v2" as tfplan
+
+allowed = [
+ "t2.small",
+ "t3.micro"
+]
+
+ec2 = filter tfplan.resource_changes as _, r {
+
+ r.type is "aws_instance"
+
+}
+
+violations = filter ec2 as _, r {
+
+ not (r.change.after.instance_type in allowed)
+
+}
+
+main = rule {
+
+ length(violations) is 0
+
+}
+
+print("Instance type not approved. Use allowed sizes only.")
